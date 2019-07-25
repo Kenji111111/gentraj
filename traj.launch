@@ -1,0 +1,10 @@
+<launch>
+    <node pkg="gentraj" name="trajectory" type="main.py" output="screen">
+        <param name="max_height" value="3"/>
+        <param name="forward_dist" value="5"/>
+        <param name="velocity" value="0.5"/>
+        <param name="acceleration" value="1"/>
+        <param name="frequency" value="20"/>
+        <param name="quadPoseTopic" type="string" value="ENU/local_odom"/>
+    </node>
+</launch>
