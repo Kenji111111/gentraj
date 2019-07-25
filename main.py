@@ -12,6 +12,8 @@ from std_msgs.msg import Header
 from mg_msgs.msg import PVAYStampedTrajectory, PVAYStamped
 from geometry_msgs.msg import Pose, Twist, Accel, Vector3, Point, Quaternion
 
+published = False
+
 def gen_traj(dist, accel, max_vel, frequency):
 
     # NOTE: in the future, cap velocity to min(sqrt(acc * dist), max_vel)
@@ -65,6 +67,9 @@ def gen_traj(dist, accel, max_vel, frequency):
     return points
 
 def callback(data):
+    global published
+    if published:
+        return
     print('Generating trajectory...')
     # generate trajectory
     max_height = rospy.get_param('~max_height')
@@ -107,7 +112,6 @@ def callback(data):
 
     for pt in forward:
         point = Point(origin.x + math.cos(yaw) * pt.x, origin.y + math.sin(yaw) * pt.x, origin.z + max_height)
-        print(math.sin(yaw))
         
         linear_v = Vector3(pt.y, 0, 0)
         angular_v = Vector3(0, 0, 0)
@@ -156,6 +160,7 @@ def callback(data):
     traj = PVAYStampedTrajectory(points)
     pub.publish(traj)
     print('published!')
+    published = True
 
     # rospy.sleep(1)
     # rospy.signal_shutdown('trajectory already published.')
