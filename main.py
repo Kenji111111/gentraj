@@ -158,12 +158,10 @@ def callback(data):
     # publish to /trajectory
     pub = rospy.Publisher('/trajectory', PVAYStampedTrajectory, queue_size=5)
     traj = PVAYStampedTrajectory(points)
+    rospy.sleep(3)
     pub.publish(traj)
     print('published!')
     published = True
-
-    # rospy.sleep(1)
-    # rospy.signal_shutdown('trajectory already published.')
 
 if __name__ == '__main__':
 
