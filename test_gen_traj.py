@@ -7,7 +7,7 @@ import math
 from mg_msgs.msg import PVAYStampedTrajectory
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Header
-from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, Pose, Twist, Vector3, Point, Quaternion
+from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, Pose, Twist, Vector3, Point, Quaternion, PoseStamped
 
 import numpy as np
 
@@ -25,13 +25,13 @@ def callback(data):
 
 
 if __name__ == '__main__':
-    rospy.init_node('traj_listener', anonymous=True)
-    sub = rospy.Subscriber("/trajectory", PVAYStampedTrajectory, callback)
+    rospy.init_node('traj_helper', anonymous=True)
+    # sub = rospy.Subscriber("/trajectory", PVAYStampedTrajectory, callback)
 
     rospy.sleep(1)
     pub = rospy.Publisher('/ENU/local_odom', Odometry, queue_size=5)
     position = Point(0,0,0)
-    orientation = Quaternion(0,0,math.sqrt(0.5),math.sqrt(0.5))
+    orientation = Quaternion(0,0,0,1)
     covariance = np.zeros(36)
     pose = Pose(position, orientation)
     posec = PoseWithCovariance(pose, covariance)
@@ -40,12 +40,22 @@ if __name__ == '__main__':
     twist = Twist(linear, angular)
     twistc = TwistWithCovariance(twist, covariance)
     stamp = rospy.Time.now()
-    header = Header(0, stamp, '/traj_listener')
+    header = Header(0, stamp, '/traj_helper')
     odom = Odometry(header, '0', posec, twistc)
+
+    pub2 = rospy.Publisher('/mavros/mocap/pose', PoseStamped, queue_size=5)
+    poseStamped = PoseStamped(header, pose)    
+
 
     r = rospy.Rate(1)
     while not rospy.is_shutdown():
+        stamp = rospy.Time.now()
+        header = Header(0, stamp, 'traj_helper')
+        odom = Odometry(header, '0', posec, twistc)
+        poseStamped = PoseStamped(header, pose)
+
         pub.publish(odom)
+        pub2.publish(poseStamped)
         r.sleep()
 
     rospy.spin()

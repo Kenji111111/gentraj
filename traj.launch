@@ -7,4 +7,6 @@
         <param name="frequency" value="20"/>
         <param name="quadPoseTopic" type="string" value="ENU/local_odom"/>
     </node>
+    <node pkg="gentraj" name="traj_helper" type="test_gen_traj.py" output="screen">
+    </node>
 </launch>

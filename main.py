@@ -158,10 +158,25 @@ def callback(data):
     # publish to /trajectory
     pub = rospy.Publisher('/trajectory', PVAYStampedTrajectory, queue_size=5)
     traj = PVAYStampedTrajectory(points)
-    rospy.sleep(3)
+    rospy.sleep(7)
     pub.publish(traj)
     print('published!')
     published = True
+
+def publishENULocalOdom():
+    pub = rospy.Publisher('/ENU/local_odom', Odometry, queue_size=5)
+    position = Point(0,0,0)
+    orientation = Quaternion(0,0,math.sqrt(0.5),math.sqrt(0.5))
+    covariance = np.zeros(36)
+    pose = Pose(position, orientation)
+    posec = PoseWithCovariance(pose, covariance)
+    linear = Vector3(0,0,0)
+    angular = Vector3(0,0,0)
+    twist = Twist(linear, angular)
+    twistc = TwistWithCovariance(twist, covariance)
+    stamp = rospy.Time.now()
+    header = Header(0, stamp, '/traj_listener')
+    odom = Odometry(header, '0', posec, twistc)
 
 if __name__ == '__main__':
 
